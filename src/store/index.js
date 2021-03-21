@@ -17,7 +17,7 @@ import { createStore } from "vuex";
 export const FetchLibraryGithub = {
   async fetchLibrary(name) {
     let url =
-      "https://raw.githubusercontent.com/naproche-community/naproche/master/examples/" +
+      "https://raw.githubusercontent.com/naproche-community/naproche/refactor-backend/examples/" +
       name;
     return await fetch(url);
   }
@@ -52,10 +52,16 @@ const FileStore = {
   },
   mutations: {
     addUserFile(state, payload) {
-      state.userFiles[payload.name] = { exists: true, content: payload.content };
+      state.userFiles[payload.name] = {
+        exists: true,
+        content: payload.content
+      };
     },
     addLibraryFile(state, payload) {
-      state.libraryFiles[payload.name] = { exists: true, content: payload.content };
+      state.libraryFiles[payload.name] = {
+        exists: true,
+        content: payload.content
+      };
     },
     noUserFile(state, name) {
       state.userFiles[name] = { exists: false, content: "" };
@@ -65,7 +71,7 @@ const FileStore = {
     }
   },
   getters: {
-    readFile: (state) => (name) => {
+    readFile: state => name => {
       if (state.userFiles[name] && state.userFiles[name].exists) {
         return state.userFiles[name].content;
       } else if (state.libraryFiles[name]) {
@@ -80,17 +86,22 @@ const FileStore = {
       let libraryFile = context.state.libraryFiles[payload.name];
       if (!userFile) {
         let response = await payload.fetchUser(payload.name);
-        if (response.status === 200) {
+        if (response && response.status === 200) {
           let fetched = await response.text();
-          console.log(fetched);
-          context.commit("addUserFile", { name: payload.name, content: fetched });
+          context.commit("addUserFile", {
+            name: payload.name,
+            content: fetched
+          });
         } else {
           context.commit("noUserFile", payload.name);
           if (!libraryFile) {
             let response = await payload.fetchLibrary(payload.name);
-            if (response.status === 200) {
+            if (response && response.status === 200) {
               let fetched = await response.text();
-              context.commit("addLibraryFile", { name: payload.name, content: fetched });
+              context.commit("addLibraryFile", {
+                name: payload.name,
+                content: fetched
+              });
             } else {
               context.commit("noLibraryFile", payload.name);
             }
@@ -114,7 +125,7 @@ const CacheStore = {
   },
   actions: {
     async init(context) {
-      if(context.state.cache === undefined) {
+      if (context.state.cache === undefined) {
         const cache = await caches.open("naproche-cache");
         context.commit("init", cache);
       }

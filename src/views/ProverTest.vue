@@ -12,10 +12,12 @@ export default {
     return {
       file: "",
       prover: undefined
-    }
+    };
   },
   mounted() {
-    const task = catAxioms + `
+    const task =
+      catAxioms +
+      `
       cnf(ab_equals_c,hypothesis,
           ( product(a,b,c) )).
 
@@ -33,15 +35,17 @@ export default {
       cnf(prove_h_equals_g,negated_conjecture,
           (  h != g )).
     `;
-    var addFile = t => { this.file = this.file + t; };
-    this.prover = new Worker('prover.js');
+    var addFile = t => {
+      this.file = this.file + t;
+    };
+    this.prover = new Worker("prover.js");
     this.prover.onmessage = function(msg) {
       addFile(msg.data.content);
-    }
+    };
     this.prover.postMessage(task);
   },
   beforeUnmount() {
-      this.prover.terminate();
+    this.prover.terminate();
   }
 };
 
