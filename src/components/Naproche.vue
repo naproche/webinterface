@@ -1,8 +1,13 @@
 <template>
   <div class="naprocheOut">
-    <p v-for="line of lines" :key="line.id" :class="[line.type]">
-      {{ line.line }}
-    </p>
+    <div v-if="!lines.length && running">
+      <p>parsing ....</p>
+    </div>
+    <div v-else>
+      <p v-for="line of lines" :key="line.id" :class="[line.type]">
+        {{ line.line }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -33,6 +38,7 @@ export default {
   data() {
     return {
       lines: [],
+      running: false,
       prover: undefined,
       naproche: undefined,
       proverOut: ""
@@ -56,6 +62,7 @@ export default {
   },
   methods: {
     runNaproche() {
+      this.running = true;
       this.naproche = new Worker("naproche.js");
       const send = msg => this.naproche.postMessage(msg);
       send(""); // Start Naproche
@@ -149,24 +156,11 @@ const initOpt = `
 [provers provers.json]
 [prover eprover]
 [timelimit 3]
-[depthlimit 7]
-[checktime 1]
-[checkdepth 3]
 [prove on]
 [check on]
-[symsign on]
-[info on]
-[thesis on]
-[filter on]
 [skipfail off]
-[flat off]
 [printgoal on]
-[printreason off]
-[printsection off]
-[printcheck off]
 [printprover off]
-[printunfold off]
-[printfulltask off]
 [tex off]
 `;
 
@@ -191,7 +185,7 @@ const proversJson = `
       "failureMessage": [
          "# SZS status CounterSatisfiable"
       ],
-      "unknownMessage": [
+      "resourceOutMessage": [
          "# SZS status ResourceOut",
          "# SZS status GaveUp"
       ]
@@ -219,7 +213,7 @@ const proversJson = `
       "failureMessage": [
          "# SZS status CounterSatisfiable"
       ],
-      "unknownMessage": [
+      "resourceOutMessage": [
          "# SZS status ResourceOut",
          "# SZS status GaveUp"
       ]
@@ -242,7 +236,7 @@ const proversJson = `
       "failureMessage": [
          "SPASS beiseite: Completion found."
       ],
-      "unknownMessage": [
+      "resourceOutMessage": [
          "SPASS beiseite: Ran out of time."
       ]
    },
@@ -262,7 +256,7 @@ const proversJson = `
       "failureMessage": [
          "% SZS status CounterSatisfiable for"
       ],
-      "unknownMessage": [
+      "resourceOutMessage": [
          "% SZS status Timeout for"
       ]
    }

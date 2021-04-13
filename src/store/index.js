@@ -17,7 +17,7 @@ import { createStore } from "vuex";
 export const FetchLibraryGithub = {
   async fetchLibrary(name) {
     let url =
-      "https://raw.githubusercontent.com/naproche-community/naproche/refactor-backend/examples/" +
+      "https://raw.githubusercontent.com/naproche/naproche/dev/examples/" +
       name;
     return await fetch(url);
   }
@@ -67,7 +67,10 @@ const FileStore = {
       state.userFiles[name] = { exists: false, content: "" };
     },
     noLibraryFile(state, name) {
-      state.libraryFile[name] = { exists: false, content: "" };
+      state.libraryFiles[name] = { exists: false, content: "" };
+    },
+    cleanUserFiles(state) {
+      state.userFiles = {};
     }
   },
   getters: {

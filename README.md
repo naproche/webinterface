@@ -2,7 +2,11 @@
 
 The official webinterface for Naproche.
 To update the Naproche component, update 'naproche-community/web-naproche'
-and then copy the 'frontend.jsexe' into the 'public' folder.
+and then copy 'frontend-result/bin/frontend.jsexe/all.js' to 'public/naproche-unminified.js' and run
+```
+uglifyjs naproche-unminified.js -c -o naproche.js
+```
+
 To update the prover, compile it with emscripten and update the 'public/prover.js' file.
 
 ## Project setup

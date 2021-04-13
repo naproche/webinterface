@@ -1,11 +1,11 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import IDE from "../views/IDE.vue";
+import Home from "../views/Home.vue";
 
 const routes = [
   {
     path: "/",
-    name: "IDE",
-    component: IDE
+    name: "Home",
+    component: Home
   },
   {
     path: "/text",
@@ -13,7 +13,16 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ "../views/Text.vue")
+    component: () => import(/* webpackChunkName: "Text" */ "../views/Text.vue")
+  },
+  {
+    path: "/github/:username?/:repository?/:branch?/:filename?",
+    name: "Github",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "Text" */ "../views/Github.vue")
   }
 ];
 

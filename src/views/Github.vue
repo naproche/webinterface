@@ -1,19 +1,36 @@
 <template>
-  <div class="github">
-    <input v-model="username" />
-    <input v-model="repository" />
-    <input v-model="branch" />
-    <input v-model="filename" />
-    <button v-on:click="loaded = !loaded">
-      {{ loaded ? "Unload" : "Load" }}
-    </button>
-    <Naproche
-      v-if="loaded"
-      :args="['--fof=on', '--prover=spass', filename]"
-      :fetchUser="fetchUser"
-    />
+  <div>
+    <input class="username" v-model="username" placeholder="Username" />
+    <input class="repository" v-model="repository" placeholder="Repository" />
+    <input class="branch" v-model="branch" placeholder="Branch" />
+    <input class="filename" v-model="filename" placeholder="Filename" />
+    <button @click="sync()">Sync</button>
+    <div style="float: right">
+      <button @click="translate()">Translate</button>
+      <button @click="load()">Check</button>
+    </div>
+  </div>
+  <div class="naproche-output-wrapper">
+    <Naproche :args="args" :fetchUser="fetchUser" />
   </div>
 </template>
+
+<style scoped>
+.naproche-output-wrapper {
+  padding: 5%;
+  width: 90%;
+}
+
+.username,
+.repository,
+.branch {
+  width: 10em;
+}
+
+.filename {
+  width: 20em;
+}
+</style>
 
 <script>
 import { fetchUserGithub } from "@/store/index.js";
@@ -26,17 +43,61 @@ export default {
   },
   computed: {
     fetchUser() {
-      return fetchUserGithub(this.username, this.repository, this.branch)
-        .fetchUser;
+      return fetchUserGithub(
+        this.$route.params.username,
+        this.$route.params.repository,
+        this.$route.params.branch
+      ).fetchUser;
+    }
+  },
+  created() {
+    this.$watch(
+      () => this.$route.params,
+      toParams => {
+        (this.username = toParams.username),
+          (this.repository = toParams.repository),
+          (this.branch = toParams.branch),
+          (this.filename = toParams.filename);
+      }
+    );
+  },
+  methods: {
+    load() {
+      this.updateUrl();
+      this.args = ["--fof=on", "--prover=spass", this.$route.params.filename];
+    },
+    translate() {
+      this.updateUrl();
+      this.args = [
+        "-T",
+        "--fof=on",
+        "--prover=spass",
+        this.$route.params.filename
+      ];
+    },
+    sync() {
+      this.updateUrl();
+      this.$store.commit("cleanUserFiles");
+    },
+    updateUrl() {
+      this.$router.push({
+        name: "Github",
+        params: {
+          username: this.username,
+          repository: this.repository,
+          branch: this.branch,
+          filename: this.filename
+        }
+      });
     }
   },
   data() {
     return {
-      loaded: false,
-      username: "naproche-community",
-      repository: "naproche",
-      branch: "refactor-backend",
-      filename: "examples/geometry/formalization.ftl.tex"
+      args: [],
+      username: this.$route.params.username,
+      repository: this.$route.params.repository,
+      branch: this.$route.params.branch,
+      filename: this.$route.params.filename
     };
   }
 };
