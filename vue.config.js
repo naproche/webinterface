@@ -4,5 +4,10 @@ module.exports = {
       args[0].title = "Naproche Web";
       return args;
     });
+  },
+  pwa: {
+      workboxOptions: {
+          skipWaiting: true
+      }
   }
 };
