@@ -38,7 +38,7 @@ export default {
     var addFile = t => {
       this.file = this.file + t;
     };
-    this.prover = new Worker("prover.js");
+    this.prover = new Worker("spass.js");
     this.prover.onmessage = function(msg) {
       addFile(msg.data.content);
     };

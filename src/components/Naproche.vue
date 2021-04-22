@@ -144,7 +144,7 @@ export default {
     }
   },
   mounted() {
-    this.prover = new Worker("prover.js");
+    this.prover = new Worker("spass.js");
   },
   beforeUnmount() {
     this.prover.terminate();
@@ -173,7 +173,7 @@ const proversJson = `
       "arguments": [
          "--auto",
          "-s",
-         "--memory-limit=%m",
+         "--memory-limit=1024",
          "--cpu-limit=%t"
       ],
       "successMessage": [
