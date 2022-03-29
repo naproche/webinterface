@@ -1,29 +1,29 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import Home from "../views/Home.vue";
+import TextPane from "../views/TextPane.vue";
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home
+    name: "TextPane",
+    component: TextPane
   },
-  {
-    path: "/text",
-    name: "Text",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "Text" */ "../views/Text.vue")
-  },
-  {
-    path: "/github/:username?/:repository?/:branch?/:filename?",
-    name: "Github",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "Text" */ "../views/Github.vue")
-  }
+  // {
+    // path: "/text",
+    // name: "TextPane",
+    // // route level code-splitting
+    // // this generates a separate chunk (about.[hash].js) for this route
+    // // which is lazy-loaded when the route is visited.
+    // component: () => import(/* webpackChunkName: "Text" */ "../views/TextPane.vue")
+  // },
+  // {
+    // path: "/github/:username?/:repository?/:branch?/:filename?",
+    // name: "LoadFromGithub",
+    // // route level code-splitting
+    // // this generates a separate chunk (about.[hash].js) for this route
+    // // which is lazy-loaded when the route is visited.
+    // component: () =>
+      // import(/* webpackChunkName: "Text" */ "../views/LoadFromGithub.vue")
+  // }
 ];
 
 const router = createRouter({

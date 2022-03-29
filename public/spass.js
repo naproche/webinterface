@@ -4,15 +4,40 @@
 
 onmessage = function(request) {
   var Module = {
-    "print": function(msg) {
-      postMessage({ Req: "proverOut", error: false,  content: msg});
-    },
-    "printErr": function(msg) {
-      postMessage({ Req: "proverOut", error: true,  content: msg});
-    },
-    "arguments": request.data.Args.concat(["task.p"]),
+    "arguments": request.data.Args,
+    // see: https://stackoverflow.com/questions/32912129/providing-stdin-to-an-emscripten-html-program
     "preRun": function() {
-        FS.writeFile("task.p", request.data.Task);
+        var i = 0;
+        function stdin() {
+          if (i < request.data.Task.length) {
+            var code = request.data.Task.charCodeAt(i);
+            ++i;
+            return code;
+          } else {
+            return null;
+          }
+        }
+
+        var stdoutBuffer = "";
+        function stdout(code) {
+          if (code === "\n".charCodeAt(0) && stdoutBuffer !== "") {
+            postMessage({ Req: "proverOut", error: false,  content: stdoutBuffer});
+            stdoutBuffer = "";
+          } else {
+            stdoutBuffer += String.fromCharCode(code);
+          }
+        }
+
+        var stderrBuffer = "";
+        function stderr(code) {
+          if (code === "\n".charCodeAt(0) && stderrBuffer !== "") {
+            postMessage({ Req: "proverOut", error: true,  content: stderrBuffer});
+            stderrBuffer = "";
+          } else {
+            stderrBuffer += String.fromCharCode(code);
+          }
+        }
+        FS.init(stdin, stdout, stderr);
     },
     "postRun": function() {
       postMessage({ Req: "proverDone" });

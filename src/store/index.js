@@ -17,7 +17,7 @@ import { createStore } from "vuex";
 export const FetchLibraryGithub = {
   async fetchLibrary(name) {
     let url =
-      "https://raw.githubusercontent.com/naproche/naproche/dev/examples/" +
+      "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/" +
       name;
     return await fetch(url);
   }
@@ -115,41 +115,11 @@ const FileStore = {
   }
 };
 
-// A cache of filenames -> binary
-// https://developer.mozilla.org/en-US/docs/Web/API/Cache
-const CacheStore = {
-  state: {
-    cache: undefined
-  },
-  mutations: {
-    init(state, cache) {
-      state.cache = cache;
-    }
-  },
-  actions: {
-    async init(context) {
-      if (context.state.cache === undefined) {
-        const cache = await caches.open("naproche-cache");
-        context.commit("init", cache);
-      }
-    },
-    async store(context, payload) {
-      await context.dispatch("init");
-      context.state.cache.put(payload.req, payload.resp);
-    },
-    async retrieve(context, name) {
-      await context.dispatch("init");
-      return context.state.cache.match(name);
-    }
-  }
-};
-
 export default createStore({
   state: {},
   mutations: {},
   actions: {},
   modules: {
-    files: FileStore,
-    cache: CacheStore
+    files: FileStore
   }
 });
