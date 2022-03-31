@@ -1,6 +1,6 @@
 <template>
   <div class="naprocheOut">
-    <div v-if="!lines.length && running">
+    <div v-if="parsing">
       <p>parsing ....</p>
     </div>
     <div v-else>
@@ -35,53 +35,30 @@ import { FetchLibraryGithub } from "@/store/index.js";
 
 export default {
   name: "NaprocheOutput",
-  props: {
-    args: Array,
-    fetchUser: Function
-  },
   data() {
     return {
       lines: [],
-      running: false,
-      prover: undefined,
+      activeProver: undefined,
       naproche: undefined,
+      parsing: false,
+      provers: {},
       proverOut: [],
       proverErr: []
     };
   },
-  watch: {
-    args: {
-      deep: true,
-      handler(args) {
-        console.log("Naproche activated!");
-        if (this.naproche !== undefined) {
-          this.naproche.terminate();
-        }
-        if (args === []) {
-          return;
-        }
-        this.lines = [];
-        this.runNaproche();
-      }
-    }
-  },
   methods: {
-    runNaproche() {
-      this.running = true;
+    runNaproche(args, fetchUser, chooseProver) {
+      if (this.naproche !== undefined) {
+        this.naproche.terminate();
+      }
+      this.lines = [];
+      this.parsing = true;
+      this.activeProver = this.provers[chooseProver];
       this.naproche = new Worker("naproche.js");
       const send = msg => this.naproche.postMessage(msg);
       send(""); // Start Naproche
       this.naproche.onmessage = msg => {
-        console.log(msg.data);
         if (msg.data.Req === "config") {
-          // This is likely a bug in vue js.
-          // When the args prop is dynamic, it becomes a proxy
-          // and we have to extract the data out of it.
-          const argsObj = Object.assign({}, this.args);
-          var args = [];
-          for (var a in argsObj) {
-            args.push(argsObj[a]);
-          }
           this.$store.commit("addLibraryFile", {
             name: "init.opt",
             content: initOpt
@@ -93,12 +70,13 @@ export default {
             return { type: "output", line: l ? l : " " };
           });
           this.lines = this.lines.concat(out);
+          this.parsing = false;
         }
         if (msg.data.Req === "library") {
           this.$store
             .dispatch("loadFile", {
               name: msg.data.FileName,
-              fetchUser: this.fetchUser,
+              fetchUser: fetchUser,
               ...FetchLibraryGithub
             })
             .then(() => {
@@ -111,21 +89,28 @@ export default {
             });
         }
         if (msg.data.Req === "prover") {
-          this.prover.postMessage({ Task: msg.data.Task, Args: msg.data.Args });
+          this.activeProver.postMessage({ Task: msg.data.Task, Args: msg.data.Args });
         }
       };
-      this.prover.onmessage = msg => {
-        console.log(msg.data);
+      this.activeProver.onmessage = msg => {
         if (msg.data.Req === "proverOut") {
-          if (msg.data.content.startsWith("program exited")) {
-            return;
-          } else if (msg.data.content === "Calling stub instead of signal()") {
-            return;
-          } else {
-            if(msg.data.Req.error) {
-              this.proverErr.push(msg.data.content);
+          if (msg.data.content) {
+            if (msg.data.content.startsWith("program exited")) {
+              return;
+            } else if (msg.data.content === "Calling stub instead of signal()") {
+              return;
             } else {
-              this.proverOut.push(msg.data.content);
+              if(msg.data.Req.error) {
+                this.proverErr.push(msg.data.content);
+              } else {
+                this.proverOut.push(msg.data.content);
+              }
+            }
+          } else if (msg.data.html) {
+            const doc = new DOMParser().parseFromString(msg.data.html, 'text/html');
+            const out = doc.querySelector('pre').innerHTML.split('\n');
+            for(let line in out) {
+              this.proverOut.push(out[line]);
             }
           }
         }
@@ -142,21 +127,19 @@ export default {
           }
           this.proverOut = [];
           this.proverErr = [];
-          console.log(proverOut);
           send({ proverOut: proverOut, proverErr: proverErr });
         }
       };
     }
   },
   mounted() {
-    this.prover = new Worker("spass.js");
-    if (this.args !== []) {
-      this.lines = [];
-      this.runNaproche();
-    }
+    this.provers["spass"] = new Worker("spass.js");
+    this.provers["eprover"] = new Worker("system-on-tptp.js");
   },
   beforeUnmount() {
-    this.prover.terminate();
+    this.naproche.terminate();
+    this.provers["spass"].terminate();
+    this.provers["eprover"].terminate();
   }
 };
 

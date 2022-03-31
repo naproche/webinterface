@@ -72,9 +72,9 @@ export default {
             { name: "spass",
               description: "SPASS (runs in browser)"
             },
-            // { name: "eprover",
-              // description: "Eprover (System On TPTP)"
-            // }
+            { name: "eprover",
+              description: "Eprover (System On TPTP)"
+            }
             ],
         activeFormat: "ftl",
         formats: [

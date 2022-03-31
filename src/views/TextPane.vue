@@ -1,8 +1,7 @@
 <template>
   <div class="text-wrap">
     <MenuBar :onTranslate="translate" :onCheck="load" :showFormatToggle="true"
-      :onFormatChange="function(t) { if(t == 'ftl') { usetex = false; } else { usetex = true; } }"
-      :onLoadFile="loadFile" />
+      :onFormatChange="useFormat" :onProverChange="useProver" :onLoadFile="loadFile" />
     <SplitPanes style="flex: 1" :initRatio="0.5" :min-left="0.2" :min-right="0.1">
       <template v-slot:left>
         <div class="left-flex">
@@ -13,7 +12,7 @@
       </template>
       <template v-slot:right>
         <div id="right-wrapper">
-          <div v-if="showhome">
+          <div v-show="showhome">
             <div id="home-screen">
               <h1>Naproche</h1>
               <p>
@@ -35,9 +34,9 @@
               <p>Enjoy!</p>
             </div>
           </div>
-          <div v-else>
+          <div v-show="!showhome">
             <div class="naproche-output-wrapper">
-              <NaprocheOutput :args="args" :fetchUser="fetchUser" />
+              <NaprocheOutput ref="naproche" />
             </div>
           </div>
         </div>
@@ -126,17 +125,28 @@ export default {
     }
   },
   methods: {
+    useFormat(t) {
+      if(t == 'ftl') {
+        this.usetex = false;
+      } else {
+        this.usetex = true;
+      }
+    },
+    useProver(t) {
+      this.prover = t;
+    },
     load() {
       this.showhome = false;
       this.$store.commit("addUserFile", {
         name: "textarea.ftl",
         content: this.stdin
       });
-      this.args = [
+      let args = [
         "--tex=" + this.hastex,
-        "--prover=spass",
+        "--prover=" + this.prover,
         "textarea.ftl"
       ];
+      this.$refs.naproche.runNaproche(args, this.fetchUser, this.prover);
     },
     translate() {
       this.showhome = false;
@@ -144,12 +154,13 @@ export default {
         name: "textarea.ftl",
         content: this.stdin
       });
-      this.args = [
+      let args = [
         "-T",
         "--tex=" + this.hastex,
-        "--prover=spass",
+        "--prover=" + this.prover,
         "textarea.ftl"
       ];
+      this.$refs.naproche.runNaproche(args, this.fetchUser, this.prover);
     },
     async loadFile(url) {
       let response = await fetch(url);
@@ -164,8 +175,8 @@ export default {
       loaded: false,
       usetex: false,
       showhome: true,
+      prover: "spass",
       editor: {},
-      args: [],
       stdin: ""
     };
   }
