@@ -74,6 +74,9 @@ export default {
             },
             { name: "eprover",
               description: "Eprover (System On TPTP)"
+            },
+            { name: "vampire",
+              description: "Vampire (System On TPTP)"
             }
             ],
         activeFormat: "ftl",

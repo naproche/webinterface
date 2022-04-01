@@ -134,12 +134,14 @@ export default {
   },
   mounted() {
     this.provers["spass"] = new Worker("spass.js");
-    this.provers["eprover"] = new Worker("system-on-tptp.js");
+    this.provers["eprover"] = new Worker("eprover.js");
+    this.provers["vampire"] = new Worker("vampire.js");
   },
   beforeUnmount() {
     this.naproche.terminate();
     this.provers["spass"].terminate();
     this.provers["eprover"].terminate();
+    this.provers["vampire"].terminate();
   }
 };
 
