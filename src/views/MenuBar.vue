@@ -6,7 +6,7 @@
         <div href="#" id="menuLink1" class="pure-menu-link">Load</div>
         <ul class="pure-menu-children">
           <li class="pure-menu-item" v-for="file in files" :key="file.name">
-            <a v-on:click="onLoadFile(file.url); false;"
+            <a v-on:click="loadFile(file); false;"
                href="javascript:void(0);" class="pure-menu-link">{{ file.name }}</a>
           </li>
         </ul>
@@ -25,7 +25,7 @@
         <div id="menuLink1" class="pure-menu-link">Format</div>
         <ul class="pure-menu-children">
           <li class="pure-menu-item" v-for="format in formats" :key="format.name">
-            <a v-on:click="activeFormat = format.name; onFormatChange(format.name); false;"
+            <a v-on:click="activeFormat = format.name; changeFormat(format.name); false;"
                href="javascript:void(0);" class="pure-menu-link">{{ format.description }}
             <i v-if="format.name == activeFormat" class="fa-solid fa-circle-check"></i></a>
           </li>
@@ -60,10 +60,17 @@ export default {
   props: {
     onTranslate: Function,
     onCheck: Function,
-    onFormatChange: Function,
+    changeFormat: Function,
     onProverChange: Function,
     showFormatToggle: Boolean,
     onLoadFile: Function,
+  },
+  methods: {
+    loadFile(file) {
+      this.activeFormat = file.format;
+      this.changeFormat(file.format);
+      this.onLoadFile(file.url);
+    },
   },
   data () {
     return {
@@ -88,19 +95,42 @@ export default {
               description: "LaTeX input (.ftl.tex)"
             }],
         files: [
+            { name: "Agatha (tex)",
+              format: "tex",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/agatha.ftl.tex"
+            },
             { name: "Cantor (ftl)",
+              format: "ftl",
               url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/cantor.ftl"
             },
-            { name: "Checkerboard (ftl)",
-              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/checkerboard.ftl"
+            { name: "Dwarfs (tex)",
+              format: "tex",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/dwarfs.ftl.tex"
+            },
+            { name: "Groups (tex)",
+              format: "tex",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/group.lean.ftl.tex"
+            },
+            { name: "Maximum Modulus (ftl)",
+              format: "ftl",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/maximum_modulus.ftl"
+            },
+            { name: "Newman (ftl)",
+              format: "ftl",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/newman.ftl"
+            },
+            { name: "Prime no square (ftl)",
+              format: "ftl",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/prime_no_square.ftl"
+            },
+            { name: "Tarski (ftl)",
+              format: "ftl",
+              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/tarski.ftl"
             },
             // Oddly, code-mirror only shows the last 1343 lines :(
             // { name: "Tarskian Geometry (tex)",
               // url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/geometry/formalization.ftl.tex"
             // },
-            { name: "Prime no square (ftl)",
-              url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/prime_no_square.ftl"
-            }
         ]
     }
   }

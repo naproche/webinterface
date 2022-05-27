@@ -1,7 +1,7 @@
 <template>
   <div class="text-wrap">
     <MenuBar :onTranslate="translate" :onCheck="load" :showFormatToggle="true"
-      :onFormatChange="useFormat" :onProverChange="useProver" :onLoadFile="loadFile" />
+      :changeFormat="useFormat" :onProverChange="useProver" :onLoadFile="loadFile" />
     <SplitPanes style="flex: 1" :initRatio="0.5" :min-left="0.2" :min-right="0.1">
       <template v-slot:left>
         <div class="left-flex">
