@@ -95,6 +95,10 @@ export default {
               description: "LaTeX input (.ftl.tex)"
             }],
         files: [
+            { name: "Tutorial (tex)",
+              format: "tex",
+              url: "https://raw.githubusercontent.com/naproche/naproche/c8c4ca2d5fdb92bf17e0e54c99bd2a9691255d80/examples/TUTORIAL.ftl.tex"
+            },
             { name: "Agatha (tex)",
               format: "tex",
               url: "https://raw.githubusercontent.com/naproche/naproche/1d645706c9e44cd8f3f78502132987cde8f1d1c0/examples/agatha.ftl.tex"
